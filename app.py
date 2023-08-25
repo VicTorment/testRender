@@ -29,7 +29,7 @@ def load_and_display_csv():
 
 selected = option_menu(
     menu_title = None, 
-    options = ["File data","Parent/Child Business unit","Business unit/Category", "Category/ Subcategory", "Business unit, delta", "Org chart"],
+    options = ["File data","Parent/Child Business unit","Business unit/Category", "Category/ Subcategory", "Business unit, delta", "Organisational chart"],
     icons= ["upload", "diagram-2", "bar-chart-fill", "bar-chart-line", "file-diff", "diagram-3-fill"],
     orientation = "horizontal",
 )
@@ -122,7 +122,7 @@ if selected == "Parent/Child Business unit":
             x=df_select['Business unit child'],
             y=df_select['Score Value'],
             text=round(df_select['Score Value'],2),
-            textfont_color="rgba(0,0,0,0.85)",
+            textfont_color="rgba(230,230,230,1)",
             name=f"{each_bu} Score",
             #textposition='top center',
             #marker_color='rgba(150,150,10,0.4)',
@@ -137,7 +137,7 @@ if selected == "Parent/Child Business unit":
             y=df_select['Subcategory target score'],
             text=round(df_select['Subcategory target score'],2),
             textposition='top center',
-            textfont_color="rgba(0,0,0,0.85)",
+            textfont_color="rgba(230,230,230,1)",
             mode="lines+text",
             #marker_symbol='hexagon-dot',
             name=f"{each_bu} Target",
@@ -249,7 +249,7 @@ if selected == "Business unit/Category":
             y=df_select['Subcategory target score'],
             text=round(df_select['Subcategory target score'],2),
             textposition='top center',
-            textfont_color="rgba(0,0,0,0.85)",
+            textfont_color="rgba(230,230,230,1)",
             mode="markers+text",
             marker_symbol='hexagon-dot',
             name=f"{each_bu} Target",
@@ -271,6 +271,7 @@ if selected == "Business unit/Category":
         xaxis={'categoryorder':'category ascending'},
     )
     st.plotly_chart(fig)
+
     try:
         figs = go.Figure()
         for each_bu in unique_BU:
@@ -302,7 +303,7 @@ if selected == "Business unit/Category":
         figs.update_layout(
                 polar = dict(
                 radialaxis_angle = 0,
-                bgcolor='#99adb2',
+                bgcolor='#002b36',
                 angularaxis = dict(
                 direction = "clockwise",
                 period = df_select['Category'].nunique())
@@ -414,7 +415,7 @@ if selected == "Category/ Subcategory":
             y=df_select['Subcategory target score'],
             text=round(df_select['Subcategory target score'],2),
             textposition='top center',
-            textfont_color="rgba(0,0,0,0.85)",
+            textfont_color="rgba(230,230,230,1)",
             mode="markers+text",
             marker_symbol='hexagon-dot',
             name=f"{each_bu} Target",
@@ -423,7 +424,6 @@ if selected == "Category/ Subcategory":
             legendgroup=each_bu,
         )
         )
-        
         # Update layout for dual y-axes
     
     fig.update_layout(
@@ -432,9 +432,7 @@ if selected == "Category/ Subcategory":
         legend=dict(x=0.85, y=1),
         xaxis={'categoryorder':'category ascending'},
     )
-    
     st.plotly_chart(fig)
-
 
 if selected == "Business unit, delta":
     df = load_and_display_csv()
@@ -559,11 +557,11 @@ if selected == "Business unit, delta":
         legend=dict(x=1, y=1),
         xaxis={'categoryorder':'category ascending'},
     )
-
-
     st.plotly_chart(fig)
 
-if selected == "Org chart":
+if selected == "Organisational chart":
+    st.sidebar.header("Sidebar shows filters in other tabs")
+    df = load_and_display_csv()
     def compute_positions(data):
         levels = {}
         for row in data:
@@ -647,20 +645,8 @@ if selected == "Org chart":
         #fig.show()
         st.plotly_chart(fig)
 
-    # Sample data: [parent name, parent level, child name, child level]
-    data = {
-        'parent_name': ["CEO", "CEO", "CTO", "CFO", "Dev Team", "Dev Team"],
-        'parent_level': [1, 1, 2, 2, 3, 3],
-        'child_name': ["CTO", "CFO", "Dev Team", "Finance Team", "Frontend", "Backend"],
-        'child_level': [2, 2, 3, 3, 4, 4]
-    }
-
-    df = pd.DataFrame(data)
-    df_cols = pd.read_excel(io='Data2.xlsx', engine='openpyxl', usecols='A:Q', sheet_name='Sheet0', nrows=2000)
-    df = df_cols[["Business unit parent","Business unit parent tier","Business unit child","Business unit child tier"]]
-    grouped_data = df_cols.groupby(["Business unit parent"])
-
+    df_cols = df[["Business unit parent","Business unit parent tier","Business unit child","Business unit child tier"]]
     # Convert DataFrame rows into tuples for the function
     #rows = [tuple(row) for _, row in df.iterrows()]
-    rows = [tuple(row) for _, row in df.iterrows()]
+    rows = [tuple(row) for _, row in df_cols.iterrows()]
     build_organizational_chart(rows)
