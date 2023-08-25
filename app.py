@@ -6,8 +6,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 from streamlit_option_menu import option_menu
+import toml
 st.set_page_config(page_title="Assessment tool", page_icon=":bar_chart:", layout="centered")
 #st.title("This is awsome!!!")
+
 
 current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 css_file =  current_dir /"styles" / "main.css"
@@ -15,7 +17,7 @@ css_file =  current_dir /"styles" / "main.css"
 with open(css_file) as f:
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
-
+data = toml.load(current_dir / ".streamlit" / "config.toml")
 
 @st.cache_data(experimental_allow_widgets=True, ttl=900)
 def load_and_display_csv():
@@ -303,7 +305,7 @@ if selected == "Business unit/Category":
         figs.update_layout(
                 polar = dict(
                 radialaxis_angle = 0,
-                bgcolor='#002b36',
+                bgcolor=data['theme']['backgroundColor'],
                 angularaxis = dict(
                 direction = "clockwise",
                 period = df_select['Category'].nunique())
