@@ -19,7 +19,7 @@ with open(css_file) as f:
 
 data = toml.load(current_dir / ".streamlit" / "config.toml")
 
-@st.cache_data(experimental_allow_widgets=True, ttl=900)
+#@st.cache_data(experimental_allow_widgets=True, ttl=900)
 def load_and_display_csv():
     if uploaded_file is not None:
         if uploaded_file.name.endswith("xlsx"):
@@ -39,14 +39,19 @@ selected = option_menu(
 if selected == "File data":
     st.sidebar.header("Sidebar shows filters")
     st.subheader("Upload only .xls or .xlsx files")
-    if st.button("Clear data"):
-        st.cache_data.clear()
+    #if st.button("Clear data"):
+    #   st.cache_data.clear()
     uploaded_file = st.file_uploader("Choose a file")
-    df = load_and_display_csv()
-    st.write(df.head())
+    if uploaded_file is not None:
+        if uploaded_file.name.endswith("xlsx"):
+            dataframe = pd.read_excel(io=uploaded_file, engine='openpyxl', usecols='A:Q', sheet_name='Sheet0', nrows=2000)
+        else:
+            dataframe = pd.read_excel(io=uploaded_file,  usecols='A:Q', sheet_name='Sheet0', nrows=2000)
+    st.session_state.df = dataframe
+    st.write(st.session_state.df.head())
     
 if selected == "Parent/Child Business unit":
-    df = load_and_display_csv()
+    df = st.session_state.df
     st.sidebar.header("Please filter here:")
     bunit = st.sidebar.multiselect(
         "Select Business unit parent:",
@@ -158,7 +163,7 @@ if selected == "Parent/Child Business unit":
     st.plotly_chart(fig)
 
 if selected == "Business unit/Category":
-    df = load_and_display_csv()
+    df = st.session_state.df
     st.sidebar.header("Please filter here:")
     bunit = st.sidebar.multiselect(
         "Select Business unit:",
@@ -316,7 +321,7 @@ if selected == "Business unit/Category":
         st.subheader("Choose only one business unit to get polar chart")
 
 if selected == "Category/ Subcategory":
-    df = load_and_display_csv()
+    df = st.session_state.df
     st.sidebar.header("Please filter here:")
     bunit = st.sidebar.multiselect(
         "Select Business unit:",
@@ -437,7 +442,7 @@ if selected == "Category/ Subcategory":
     st.plotly_chart(fig)
 
 if selected == "Business unit, delta":
-    df = load_and_display_csv()
+    df = st.session_state.df
     #add column with formatted date
     df['DOA'] = df['End date'].dt.strftime('%Y-%m')
 
@@ -563,7 +568,7 @@ if selected == "Business unit, delta":
 
 if selected == "Organisational chart":
     st.sidebar.header("Sidebar shows filters in other tabs")
-    df = load_and_display_csv()
+    df = st.session_state.df
     def compute_positions(data):
         levels = {}
         for row in data:
