@@ -49,9 +49,10 @@ if selected == "File data":
             dataframe = pd.read_excel(io=uploaded_file,  usecols='A:Q', sheet_name='Sheet0', nrows=2000)
     st.session_state.df = dataframe
     st.write(st.session_state.df.head())
+    df = st.session_state.df
     
 if selected == "Parent/Child Business unit":
-    df = st.session_state.df
+    
     st.sidebar.header("Please filter here:")
     bunit = st.sidebar.multiselect(
         "Select Business unit parent:",
@@ -163,7 +164,7 @@ if selected == "Parent/Child Business unit":
     st.plotly_chart(fig)
 
 if selected == "Business unit/Category":
-    df = st.session_state.df
+    #df = st.session_state.df
     st.sidebar.header("Please filter here:")
     bunit = st.sidebar.multiselect(
         "Select Business unit:",
