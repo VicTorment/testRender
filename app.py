@@ -631,7 +631,7 @@ if selected == "Organisational chart":
             hoverinfo='text',
             marker=dict(
                 showscale=False,
-                size=50,
+                size=20,
                 line_width=2
             ),
             text=[node for node in G.nodes()],
