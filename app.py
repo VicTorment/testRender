@@ -12,7 +12,7 @@ st.set_page_config(page_title="Assessment tool", page_icon=":bar_chart:", layout
 
 
 current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
-css_file =  current_dir /"styles" / "main.css"
+css_file =  current_dir /"Styles" / "main.css"
 
 with open(css_file) as f:
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
@@ -20,13 +20,13 @@ with open(css_file) as f:
 data = toml.load(current_dir / ".streamlit" / "config.toml")
 
 #@st.cache_data(experimental_allow_widgets=True, ttl=900)
-def load_and_display_csv():
-    if uploaded_file is not None:
-        if uploaded_file.name.endswith("xlsx"):
-            dataframe = pd.read_excel(io=uploaded_file, engine='openpyxl', usecols='A:Q', sheet_name='Sheet0', nrows=2000)
-        else:
-            dataframe = pd.read_excel(io=uploaded_file,  usecols='A:Q', sheet_name='Sheet0', nrows=2000)
-    return dataframe
+#def load_and_display_csv():
+#    if uploaded_file is not None:
+#        if uploaded_file.name.endswith("xlsx"):
+#            dataframe = pd.read_excel(io=uploaded_file, engine='openpyxl', usecols='A:Q', sheet_name='Sheet0', nrows=2000)
+#        else:
+#            dataframe = pd.read_excel(io=uploaded_file,  usecols='A:Q', sheet_name='Sheet0', nrows=2000)
+#    return dataframe
 
 
 selected = option_menu(
@@ -39,8 +39,6 @@ selected = option_menu(
 if selected == "File data":
     st.sidebar.header("Sidebar shows filters")
     st.subheader("Upload only .xls or .xlsx files")
-    #if st.button("Clear data"):
-    #   st.cache_data.clear()
     uploaded_file = st.file_uploader("Choose a file")
     if uploaded_file is not None:
         if uploaded_file.name.endswith("xlsx"):
@@ -48,11 +46,13 @@ if selected == "File data":
         else:
             dataframe = pd.read_excel(io=uploaded_file,  usecols='A:Q', sheet_name='Sheet0', nrows=2000)
     st.session_state.df = dataframe
-    st.write(st.session_state.df.head())
-    df = st.session_state.df
+    try:
+        st.write(st.session_state.df.head())
+    except:
+        st.write("No data has ben provided yet")
     
 if selected == "Parent/Child Business unit":
-    
+    df = st.session_state.df
     st.sidebar.header("Please filter here:")
     bunit = st.sidebar.multiselect(
         "Select Business unit parent:",
@@ -130,7 +130,7 @@ if selected == "Parent/Child Business unit":
             x=df_select['Business unit child'],
             y=df_select['Score Value'],
             text=round(df_select['Score Value'],2),
-            textfont_color="rgba(230,230,230,1)",
+            textfont_color=data['theme']['textColor'],
             name=f"{each_bu} Score",
             #textposition='top center',
             #marker_color='rgba(150,150,10,0.4)',
@@ -145,9 +145,9 @@ if selected == "Parent/Child Business unit":
             y=df_select['Subcategory target score'],
             text=round(df_select['Subcategory target score'],2),
             textposition='top center',
-            textfont_color="rgba(230,230,230,1)",
-            mode="lines+text",
-            #marker_symbol='hexagon-dot',
+            textfont_color=data['theme']['textColor'],
+            mode="markers+text",
+            marker_symbol='hexagon-dot',
             name=f"{each_bu} Target",
             marker=dict(size=10 ),
             offsetgroup=each_bu,
@@ -164,7 +164,7 @@ if selected == "Parent/Child Business unit":
     st.plotly_chart(fig)
 
 if selected == "Business unit/Category":
-    #df = st.session_state.df
+    df = st.session_state.df
     st.sidebar.header("Please filter here:")
     bunit = st.sidebar.multiselect(
         "Select Business unit:",
@@ -257,7 +257,7 @@ if selected == "Business unit/Category":
             y=df_select['Subcategory target score'],
             text=round(df_select['Subcategory target score'],2),
             textposition='top center',
-            textfont_color="rgba(230,230,230,1)",
+            textfont_color=data['theme']['textColor'],
             mode="markers+text",
             marker_symbol='hexagon-dot',
             name=f"{each_bu} Target",
@@ -371,7 +371,7 @@ if selected == "Category/ Subcategory":
         st.subheader(f"{total_sales:,}".replace(",","."))
 
     with middle_column:
-        st.subheader("Mean Target Score 'circle':")
+        st.subheader("Mean Target Score:")
         st.subheader(f"{average_sales:,}".replace(",","."))
     
     with right_column:
@@ -391,14 +391,14 @@ if selected == "Category/ Subcategory":
     
     unique_count = grouped_data['Business unit child'].nunique()
     unique_BU = grouped_data['Business unit child'].unique()
-
+    str_client = df_selection['Client'][0]
     fig = go.Figure(
     layout=dict(
         #xaxis=dict(categoryorder="category ascending"),
         yaxis=dict(range=[0, nbr_y]),
         scattermode="group",
         legend=dict(groupclick="toggleitem"),
-        title='Average of Score and Target by Subcategory',
+        title=f'{str_client}: <br>Average Score and Target by Subcategory',
     )
     )
     for each_bu in unique_BU:
@@ -407,13 +407,15 @@ if selected == "Category/ Subcategory":
         )
         fig.add_trace(
         go.Bar(
-            x=df_select['Subcategory'],
+            x=[df_select['Category'],df_select['Subcategory']],
             y=df_select['Score Value'],
             text=round(df_select['Score Value'],2),
             name=f"{each_bu} Score",
             #marker_color='rgba(150,150,10,0.4)',
             offsetgroup=each_bu,
             legendgroup=each_bu,
+            textfont_color=data['theme']['textColor'],
+            textposition='outside'
             #legendgrouptitle_text=each_doa,
         )
         )
@@ -423,7 +425,7 @@ if selected == "Category/ Subcategory":
             y=df_select['Subcategory target score'],
             text=round(df_select['Subcategory target score'],2),
             textposition='top center',
-            textfont_color="rgba(230,230,230,1)",
+            textfont_color=data['theme']['textColor'],
             mode="markers+text",
             marker_symbol='hexagon-dot',
             name=f"{each_bu} Target",
@@ -537,10 +539,12 @@ if selected == "Business unit, delta":
             x=df_select['Subcategory'],
             y=df_select['Score Value'],
             text=round(df_select['Score Value'],2),
+            textfont_color=data['theme']['textColor'],
             name=f"{each_doa} Score",
             #marker_color='rgba(150,150,10,0.4)',
             offsetgroup=each_doa,
             legendgroup=each_doa,
+            textposition='outside',
             #legendgrouptitle_text=each_doa,
         )
         )
@@ -549,10 +553,12 @@ if selected == "Business unit, delta":
             x=df_select['Subcategory'],
             y=df_select['Subcategory target score'],
             text=round(df_select['Subcategory target score'],2),
+            textfont_color=data['theme']['textColor'],
             textposition='top center',
             mode="markers+text",
+            marker_symbol='hexagon-dot',
             name=f"{each_doa} Target",
-            marker=dict(size=15 ),
+            marker=dict(size=10 ),
             offsetgroup=each_doa,
             legendgroup=each_doa,
         )
@@ -632,7 +638,7 @@ if selected == "Organisational chart":
             hoverinfo='text',
             marker=dict(
                 showscale=False,
-                size=20,
+                size=50,
                 line_width=2
             ),
             text=[node for node in G.nodes()],
