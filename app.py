@@ -120,7 +120,8 @@ if selected == "Parent/Child Business unit":
         fig = go.Figure(
         layout=dict(
             #xaxis=dict(categoryorder="category ascending"),
-            yaxis=dict(range=[0, nbr_y]),
+            #yaxis=dict(range=[0, nbr_y]),
+            yaxis=dict(range=[0, 5]),
             scattermode="group",
             legend=dict(groupclick="toggleitem"),
             title=f'{client_name} - parent business unit {unique_BU} <br>Average Score and Target pr. child business unit',
@@ -246,7 +247,8 @@ if selected == "Business unit/Category":
             
             layout=dict(
             #xaxis=dict(categoryorder="category ascending"),
-            yaxis=dict(range=[0, nbr_y]),
+            #yaxis=dict(range=[0, nbr_y]),
+            yaxis=dict(range=[0, 5]),
             scattermode="group",
             legend=dict(groupclick="toggleitem"),
             title=f'{client_name}   <br>Average of Score and Target by Category',
@@ -301,7 +303,8 @@ if selected == "Business unit/Category":
         #img_bytes = fig.to_image(format="png", width=800, height=450, scale=1)
         st.plotly_chart(fig,use_container_width=True)
         try:
-            figs = go.Figure()
+            figs = go.Figure(
+            )
             scores = np.append(df_select['Score Value'],df_select['Score Value'][0])
             target_scores = np.append(df_select['Subcategory target score'],df_select['Subcategory target score'][0])
             categories = np.append(df_select['Category'],df_select['Category'][0])
@@ -329,11 +332,12 @@ if selected == "Business unit/Category":
                 polar = dict(
                 radialaxis_angle = 0,
                 bgcolor=data['theme']['spiderWeb'],
+                radialaxis = dict(range=[0, 5]),
                 angularaxis = dict(
                 direction = "clockwise",
-                #legend=dict(x=0.9, y=1),
+                
                 #margin=dict(r=20),
-                period = df_select['Category'].nunique())
+                period = df_select['Category'].nunique()) #df_select['Category'].nunique()
                 ))
             st.plotly_chart(figs,use_container_width=True)
         except:
@@ -421,7 +425,8 @@ if selected == "Category/ Subcategory":
             
         layout=dict(
             #xaxis=dict(categoryorder="category ascending"),
-            yaxis=dict(range=[0, nbr_y]),
+            #yaxis=dict(range=[0, nbr_y]),
+            yaxis=dict(range=[0, 5]),
             scattermode="group",
             legend=dict(groupclick="toggleitem"),
             
@@ -561,7 +566,8 @@ if selected == "Business unit, over time":
         fig = go.Figure(
         layout=dict(
             xaxis=dict(categoryorder="category descending"),
-            yaxis=dict(range=[0, nbr_y]),
+            #yaxis=dict(range=[0, nbr_y]),
+            yaxis=dict(range=[0, 5]),
             scattermode="group",
             legend=dict(groupclick="toggleitem"),
             title=f'{client_name} - {bunit} <br>Average Score and Target by Subcategory pr. date',
@@ -659,9 +665,13 @@ if selected == "Overview pr Category/ Subcategory":
                             , row=row, col=col)
                 fig.add_trace(go.Line(x=df_sel['Subcategory'], y=df_sel['Subcategory target score'],text=round(df_sel['Subcategory target score'],2),showlegend=False)
                             , row=row, col=col)
+                fig.update_yaxes(range=[0,5])
                 fig.update_layout(
-                    yaxis1=dict(tickformat=".0%"),
-                    yaxis2=dict(tickformat=".0%"),
+                    #yaxis=dict(range=[0, 5]),
+                    #yaxis2=dict(range=[0, 5]),
+                    #yaxis3=dict(range=[0,5]),
+                    #yaxis4=dict(range=[0,5]),
+                    
                     height=(rows * 400),
                     width=800,
                     #margin=dict(r=20),
