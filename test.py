@@ -1,13 +1,6 @@
 import streamlit as st
 from pathlib import Path
-import networkx as nx
-import pandas as pd 
-import plotly.io as pio
-from plotly.subplots import make_subplots
-import plotly.express as px 
-import plotly.graph_objects as go
-import numpy as np
-from streamlit_option_menu import option_menu
+
 import toml
 #import io
 st.set_page_config(page_title="Whishlist", page_icon=":gift:", layout="wide")
