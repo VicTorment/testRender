@@ -1,34 +1,25 @@
-import networkx as nx
-import matplotlib.pyplot as plt
+import streamlit as st
+from pathlib import Path
 
-def build_organizational_chart(data):
-    # Create a directed graph
-    G = nx.DiGraph()
+import toml
+#import io
+st.set_page_config(page_title="Whishlist", page_icon=":gift:", layout="wide")
+#st.title("This is awsome!!!")
 
-    # Add nodes and edges to the graph based on data
-    for row in data:
-        parent_name, parent_level, child_name, child_level = row
-        G.add_node(parent_name, level=parent_level)
-        G.add_node(child_name, level=child_level)
-        G.add_edge(parent_name, child_name)
 
-    # Draw the graph
-    pos = nx.spring_layout(G)
-    labels = {node: node for node in G.nodes()}
+current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+css_file =  current_dir /"Styles" / "main.css"
 
-    plt.figure(figsize=(12, 8))
-    nx.draw(G, pos, labels=labels, with_labels=True, node_size=3000, node_color='skyblue', font_size=15)
-    plt.title("Organizational Chart")
-    plt.show()
+with open(css_file) as f:
+    st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
-# Sample data: [parent name, parent level, child name, child level]
-data = [
-    ["CEO", 1, "CTO", 2],
-    ["CEO", 1, "CFO", 2],
-    ["CTO", 2, "Dev Team", 3],
-    ["CFO", 2, "Finance Team", 3],
-    ["Dev Team", 3, "Frontend", 4],
-    ["Dev Team", 3, "Backend", 4],
-]
+data = toml.load(current_dir / ".streamlit" / "config.toml")
 
-build_organizational_chart(data)
+st.header('Basses ønskeliste')
+
+whishes = {('En fin paraply', 'https://www.paraplybutik.dk/butik/klassisk-paraply/groen-paraply-traehaandtag/'),
+           ('noget andet', 'www.somewhere.com')
+           }
+
+for whish in whishes:
+    st.write(f'{whish[0]} se more at {whish[1]}')
