@@ -10,6 +10,7 @@ st.set_page_config(page_title="Whishlist", page_icon=":gift:", layout="wide")
 current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
 css_file =  current_dir /"Styles" / "main.css"
 
+
 with open(css_file) as foo:
     st.markdown("<style>{}</style>".format(foo.read()), unsafe_allow_html=True)
 
